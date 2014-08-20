@@ -10,26 +10,28 @@
 
 @implementation Pepar
 
-- (id)initWithFrame:(CGRect)frame WithCount:(NSInteger) count WithCellHeight:(CGFloat) height
+- (id)initWithFrame:(CGRect)frame WithCount:(NSInteger) count WithCellHeight:(CGFloat) height WithDelegate: (id<PeparActionDelegate>) delegate
 {
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
         self.cellArray = [[NSMutableArray alloc] init];
         self.count = count;
-        for (int i =0 ; i<count; i++) {
-            UIView *cell = [[UIView alloc] initWithFrame:CGRectMake(0, height*i, frame.size.width, height)];
+        self.height = height;
+        self.delegate = delegate;
+        for (int i =0 ; i<self.count; i++) {
+            UIView *baseView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.height)];
+            UIView *cell = [self.delegate factoryCellWithView:baseView WithIndex:i];
             if (i%2 == 0)
             {
-                 cell.layer.anchorPoint = CGPointMake(0.5, 0);
-                [cell setBackgroundColor:[UIColor grayColor]];
+                cell.layer.anchorPoint = CGPointMake(0.5, 0);
+                cell.frame =CGRectMake(0, 0, self.frame.size.width, self.height);
             }
             else
             {
                 cell.layer.anchorPoint = CGPointMake(0.5, 1);
-                [cell setBackgroundColor:[UIColor lightGrayColor]];
+                cell.frame =CGRectMake(0,-self.height, self.frame.size.width, self.height);
             }
-            cell.frame =CGRectMake(0, height*i, frame.size.width, height);
             [cell setTag:i];
             [self.cellArray addObject:cell];
             [self addSubview:cell];
@@ -43,70 +45,84 @@
 - (void)startAnimationWithOpen:(BOOL) openAction
 {
     if (openAction) {
-        for (int i =0 ; i<self.count; i++) {
-            if ((i%2) == 0) {
-                CABasicAnimation * animation = [CABasicAnimation animationWithKeyPath:@"transform"];
-                UIView *cell = (UIView *)[self.cellArray objectAtIndex:i];
-                CATransform3D rotate = CATransform3DMakeRotation(-M_PI/2, 1, 0, 0);
-                CATransform3D combinedTransform = CATransform3DConcat(CATransform3DPerspect(rotate, CGPointMake(0, 0), 800), CATransform3DMakeTranslation(0, -cell.frame.size.height*i, 0));
-                [animation setToValue:[NSValue valueWithCATransform3D:CATransform3DIdentity]];
-                [animation setFromValue:[NSValue valueWithCATransform3D:combinedTransform]];
-                [animation setDuration:self.animationTiming];
-                [animation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-                [animation setRemovedOnCompletion:NO];
-                [animation setFillMode:kCAFillModeForwards];
-                [animation setDelegate:self];
-                [cell.layer addAnimation:animation forKey:@"open"];
-            }else
+        for (int i =0 ; i<self.count; i++)
+        {
+            if ((i%2) == 0)
             {
-                CABasicAnimation * animation = [CABasicAnimation animationWithKeyPath:@"transform"];
+                CAKeyframeAnimation *aCAKeyframeAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
                 UIView *cell = (UIView *)[self.cellArray objectAtIndex:i];
-                CATransform3D rotate = CATransform3DMakeRotation(M_PI/2, 1, 0, 0);
-                CATransform3D combinedTransform = CATransform3DConcat(CATransform3DPerspect(rotate, CGPointMake(0, 0), 800), CATransform3DMakeTranslation(0, -cell.frame.size.height*(i+1), 0));
-                [animation setToValue:[NSValue valueWithCATransform3D:CATransform3DIdentity]];
-                [animation setFromValue:[NSValue valueWithCATransform3D:combinedTransform]];
-                [animation setDuration:self.animationTiming];
-                [animation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-                [animation setRemovedOnCompletion:NO];
-                [animation setFillMode:kCAFillModeForwards];
-                [animation setDelegate:self];
-                [cell.layer addAnimation:animation forKey:@"open"];
+                NSMutableArray *keyAnimationArray = [[NSMutableArray alloc] init];
+                for (int j = 100; j>=0; j--) {
+                    CATransform3D rotate = CATransform3DMakeRotation(-M_PI/200*j, 1, 0, 0);
+                    CATransform3D combinedTransform = CATransform3DConcat(CATransform3DPerspect(rotate, CGPointMake(0, cell.frame.size.height), 600), CATransform3DMakeTranslation(0, cell.frame.size.height*i*sin(M_PI/200*(100-j)), 0));
+                    [keyAnimationArray addObject:[NSValue valueWithCATransform3D:combinedTransform]];
+                }
+                [aCAKeyframeAnimation setValues:keyAnimationArray];
+                [aCAKeyframeAnimation setDuration:self.animationTiming];
+                [aCAKeyframeAnimation setRemovedOnCompletion:NO];
+                [aCAKeyframeAnimation setFillMode:kCAFillModeForwards];
+                [aCAKeyframeAnimation setDelegate:self];
+                [cell.layer addAnimation:aCAKeyframeAnimation forKey:@"open"];
+            }
+            else
+            {
+                CAKeyframeAnimation *aCAKeyframeAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
+                UIView *cell = (UIView *)[self.cellArray objectAtIndex:i];
+                NSMutableArray *keyAnimationArray = [[NSMutableArray alloc] init];
+                for (int j = 100; j>=0; j--) {
+                    CATransform3D rotate = CATransform3DMakeRotation(M_PI/200*j, 1, 0, 0);
+                    CATransform3D combinedTransform = CATransform3DConcat(CATransform3DPerspect(rotate, CGPointMake(0, -cell.frame.size.height), 600), CATransform3DMakeTranslation(0,cell.frame.size.height*(1+i)*sin(M_PI/200*(100-j)), 0));
+                    [keyAnimationArray addObject:[NSValue valueWithCATransform3D:combinedTransform]];
+                }
+                [aCAKeyframeAnimation setValues:keyAnimationArray];
+                [aCAKeyframeAnimation setDuration:self.animationTiming];
+                [aCAKeyframeAnimation setRemovedOnCompletion:NO];
+                [aCAKeyframeAnimation setFillMode:kCAFillModeForwards];
+                [aCAKeyframeAnimation setDelegate:self];
+                [cell.layer addAnimation:aCAKeyframeAnimation forKey:@"open"];
             }
         }
     }
     else
     {
         for (int i =0 ; i<self.count; i++) {
-            if ((i%2) == 0) {
-                CABasicAnimation * animation = [CABasicAnimation animationWithKeyPath:@"transform"];
-                UIView *cell = (UIView *)[self.cellArray objectAtIndex:i];
-                CATransform3D rotate = CATransform3DMakeRotation(-M_PI/2, 1, 0, 0);
-                CATransform3D combinedTransform = CATransform3DConcat(CATransform3DPerspect(rotate, CGPointMake(0, 0), 800), CATransform3DMakeTranslation(0, -cell.frame.size.height*i, 0));
-                [animation setToValue:[NSValue valueWithCATransform3D:combinedTransform]];
-                [animation setDuration:self.animationTiming];
-                [animation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-                [animation setRemovedOnCompletion:NO];
-                [animation setFillMode:kCAFillModeForwards];
-                [animation setDelegate:self];
-                [cell.layer addAnimation:animation forKey:@"close"];
-            }else
+            if ((i%2) == 0)
             {
-                CABasicAnimation * animation = [CABasicAnimation animationWithKeyPath:@"transform"];
+                CAKeyframeAnimation *aCAKeyframeAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
                 UIView *cell = (UIView *)[self.cellArray objectAtIndex:i];
-                CATransform3D rotate = CATransform3DMakeRotation(M_PI/2, 1, 0, 0);
-                CATransform3D combinedTransform = CATransform3DConcat(CATransform3DPerspect(rotate, CGPointMake(0, 0), 800), CATransform3DMakeTranslation(0, -cell.frame.size.height*(i+1), 0));
-                [animation setToValue:[NSValue valueWithCATransform3D:combinedTransform]];
-                [animation setDuration:self.animationTiming];
-                [animation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-                [animation setRemovedOnCompletion:NO];
-                [animation setFillMode:kCAFillModeForwards];
-                [animation setDelegate:self];
-                [cell.layer addAnimation:animation forKey:@"close"];
+                NSMutableArray *keyAnimationArray = [[NSMutableArray alloc] init];
+                for (int j = 10; j>=0; j--) {
+                    CATransform3D rotate = CATransform3DMakeRotation(-M_PI/20*(10-j), 1, 0, 0);
+                    CATransform3D combinedTransform = CATransform3DConcat(CATransform3DPerspect(rotate, CGPointMake(0, cell.frame.size.height), 600), CATransform3DMakeTranslation(0, cell.frame.size.height*i*sin(M_PI/20*j), 0));
+                    [keyAnimationArray addObject:[NSValue valueWithCATransform3D:combinedTransform]];
+                }
+                [aCAKeyframeAnimation setValues:keyAnimationArray];
+                [aCAKeyframeAnimation setDuration:self.animationTiming];
+                [aCAKeyframeAnimation setRemovedOnCompletion:NO];
+                [aCAKeyframeAnimation setFillMode:kCAFillModeForwards];
+                [aCAKeyframeAnimation setDelegate:self];
+                [cell.layer addAnimation:aCAKeyframeAnimation forKey:@"close"];
+            }
+            else
+            {
+                CAKeyframeAnimation *aCAKeyframeAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
+                UIView *cell = (UIView *)[self.cellArray objectAtIndex:i];
+                NSMutableArray *keyAnimationArray = [[NSMutableArray alloc] init];
+                for (int j = 10; j>=0; j--) {
+                    CATransform3D rotate = CATransform3DMakeRotation(M_PI/20*(10-j), 1, 0, 0);
+                    CATransform3D combinedTransform = CATransform3DConcat(CATransform3DPerspect(rotate, CGPointMake(0, -cell.frame.size.height), 600), CATransform3DMakeTranslation(0, cell.frame.size.height*(i+1)*sin(M_PI/20*j), 0));
+                    [keyAnimationArray addObject:[NSValue valueWithCATransform3D:combinedTransform]];
+                }
+                [aCAKeyframeAnimation setValues:keyAnimationArray];
+                [aCAKeyframeAnimation setDuration:self.animationTiming];
+                [aCAKeyframeAnimation setRemovedOnCompletion:NO];
+                [aCAKeyframeAnimation setFillMode:kCAFillModeForwards];
+                [aCAKeyframeAnimation setDelegate:self];
+                [cell.layer addAnimation:aCAKeyframeAnimation forKey:@"close"];
             }
         }
 
     }
-    [self setHidden:NO];
 }
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
@@ -121,7 +137,6 @@
     }
     else
     {
-        
     }
 }
 

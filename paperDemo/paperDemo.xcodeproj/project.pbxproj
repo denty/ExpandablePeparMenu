@@ -459,6 +459,7 @@
 				ECD5BA2819A19FE500F6D130 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		ECD5BA2919A19FE500F6D130 /* Build configuration list for PBXNativeTarget "paperDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -467,6 +468,7 @@
 				ECD5BA2B19A19FE500F6D130 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
