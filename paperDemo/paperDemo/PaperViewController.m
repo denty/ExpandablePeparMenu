@@ -135,22 +135,6 @@
     return view;
 }
 
-- (NSString *)refactory
-{
-    static NSDictionary *mapping = nil;
-    if(!mapping) {
-        mapping = @{
-                    @(1) : @"valueFor1",
-                    @(2) : @"valueFor2",
-                    @(3) : @"valueFor3",
-                    @(4) : @"valueFor4",
-                    @(5) : @"valueFor5"
-                    };
-    }
-    
-    return mapping[@(4)] ?mapping[@(1)] : @"valueForDefault";
-}
-
 - (void)nagetiveAction:(UIGestureRecognizer*) gesture
 {
     CGPoint touchPoint = [gesture locationInView:buttonHolder];

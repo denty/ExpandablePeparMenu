@@ -148,7 +148,7 @@ CA_EXTERN CATransform3D CATransform3DMakePerspective(CGPoint center, float disZ)
     scale.m34 = -1.0f/disZ;
     return CATransform3DConcat(CATransform3DConcat(transToCenter, scale), transBack);
 }
-
+//t为旋转角度，center表示色相机的位置，disZ表示摄像机的距离
 CA_EXTERN CATransform3D CATransform3DPerspect(CATransform3D t, CGPoint center, float disZ)
 {
     return CATransform3DConcat(t, CATransform3DMakePerspective(center, disZ));
