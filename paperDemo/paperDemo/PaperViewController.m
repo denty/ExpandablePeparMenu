@@ -40,6 +40,13 @@
     aPepar.animationTiming = 0.5;
     [self.view addSubview:aPepar];
     buttonHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, self.view.frame.size.height)];
+    
+     UILabel * aTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, buttonHolder.frame.size.width, buttonHolder.frame.size.height)];
+    [aTitleLabel setText:@"PaperMenu"];
+    [aTitleLabel setTextColor:[UIColor whiteColor]];
+    [aTitleLabel setTextAlignment:NSTextAlignmentCenter];
+    [buttonHolder addSubview:aTitleLabel];
+    
     button = [UIButton buttonWithType:UIButtonTypeSystem];
     [button setFrame:CGRectMake(0, 25, 60, 30)];
     [button setBackgroundColor:[UIColor orangeColor]];
@@ -136,10 +143,21 @@
 - (void)nagetiveAction:(UIGestureRecognizer*) gesture
 {
     CGPoint touchPoint = [gesture locationInView:buttonHolder];
-    touchPoint.y = touchPoint.y-aPepar.count*70;
-    if ([button.layer.presentationLayer hitTest:touchPoint])
+    if (touchPoint.y<aPepar.count*70) {
+        [aPepar touchActionWithPoint:touchPoint];
+    }else
     {
-        [self open];
+        touchPoint.y = touchPoint.y-aPepar.count*70;
+        if ([button.layer.presentationLayer hitTest:touchPoint])
+        {
+            [self open];
+        }
     }
+}
+
+- (void)clickButtonWithIndex:(NSInteger)index
+{
+    UIAlertView * alertView = [[UIAlertView alloc] initWithTitle:@"alertView" message:[NSString stringWithFormat:@"touch cell With index %d",index+1] delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alertView show];
 }
 @end

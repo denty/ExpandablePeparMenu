@@ -34,10 +34,18 @@
             }
             [cell setTag:i];
             [self.cellArray addObject:cell];
+//            UIButton * cellButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//            [cellButton setFrame:CGRectMake(0, 0, cell.frame.size.width, cell.frame.size.height)];
+//            [cellButton setBackgroundColor:[UIColor clearColor]];
+//            [cellButton setTag:i];
+//            [cellButton addTarget:self action:@selector(clickButton:) forControlEvents:UIControlEventTouchUpInside];
+//            [cell addSubview:cellButton];
             [self addSubview:cell];
         }
             [self.layer setMasksToBounds:YES];
         [self setBackgroundColor:[UIColor blackColor]];
+//        UITapGestureRecognizer *gesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(nagetiveAction:)];
+//        [self addGestureRecognizer:gesture];
     }
     return self;
 }
@@ -152,5 +160,20 @@ CA_EXTERN CATransform3D CATransform3DMakePerspective(CGPoint center, float disZ)
 CA_EXTERN CATransform3D CATransform3DPerspect(CATransform3D t, CGPoint center, float disZ)
 {
     return CATransform3DConcat(t, CATransform3DMakePerspective(center, disZ));
+}
+
+- (void)touchActionWithPoint:(CGPoint) point
+{
+    for (UIView* cell in self.cellArray) {
+        if ([cell.layer.presentationLayer hitTest:point])
+        {
+            [self.delegate clickButtonWithIndex:[self.cellArray indexOfObject:cell]];
+        }
+    }
+}
+
+- (void)clickButton:(id) sender
+{
+    [self.delegate clickButtonWithIndex:[(UIButton *)sender tag]];
 }
 @end

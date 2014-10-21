@@ -12,6 +12,7 @@
 - (void)openSuccess;
 - (void)closeSuccess;
 - (UIView *)factoryCellWithView:(UIView *)view WithIndex:(NSInteger) index;
+- (void)clickButtonWithIndex:(NSInteger) index;
 @end
 @interface Pepar : UIView
 @property (nonatomic,assign) NSInteger count;
@@ -21,4 +22,5 @@
 @property (nonatomic,weak) id<PeparActionDelegate> delegate;
 - (id)initWithFrame:(CGRect)frame WithCount:(NSInteger) count WithCellHeight:(CGFloat) height WithDelegate: (id<PeparActionDelegate>) delegate;
 - (void)startAnimationWithOpen:(BOOL) openAction;
+- (void)touchActionWithPoint:(CGPoint) point;
 @end
