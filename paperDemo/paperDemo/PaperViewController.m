@@ -6,6 +6,7 @@
 //  Copyright (c) 2014年 denty. All rights reserved.
 //
 
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 #import "PaperViewController.h"
 #import "Pepar.h"
 @interface PaperViewController ()
@@ -25,13 +26,14 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+
     }
     return self;
 }
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+     [super viewDidLoad];   
     buttonArray= @[@"button1",@"button2",@"button3",@"button4",@"button5",@"button6"];
     open = YES;
     aPepar = [[Pepar alloc] initWithFrame:CGRectMake(0, 0, 320, 70*buttonArray.count) WithCount:buttonArray.count WithCellHeight:70 WithDelegate:self];
@@ -41,7 +43,7 @@
     button = [UIButton buttonWithType:UIButtonTypeSystem];
     [button setFrame:CGRectMake(0, 25, 60, 30)];
     [button setBackgroundColor:[UIColor orangeColor]];
-    [buttonHolder setBackgroundColor:[UIColor whiteColor]];
+    [buttonHolder setBackgroundColor:[UIColor colorWithRed:104.0f/255.0f green:104.0f/255.0f blue:104.0f/255.0f alpha:1]];
     [button addTarget:self action:@selector(open) forControlEvents:UIControlEventTouchUpInside];
     [button setTitle:@"open" forState:UIControlStateNormal];
     [buttonHolder addSubview:button];
@@ -114,10 +116,10 @@
 - (UIColor *)CellColorWith:(NSInteger)index
 {
     if (index%2 == 0) {
-        return [UIColor grayColor];
+        return [UIColor colorWithRed:231.0f/255.0f green:231.0f/255.0f blue:231.0f/255.0f alpha:1];
     }else
     {
-        return [UIColor lightGrayColor];
+        return [UIColor colorWithRed:254.0f/255.0f green:254.0f/255.0f blue:254.0f/255.0f alpha:1];
     }
 }
 
@@ -126,14 +128,10 @@
     UILabel *textLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, view.frame.size.width/2, view.frame.size.height)];
     [textLabel setText:[buttonArray objectAtIndex:index]];
     [view addSubview:textLabel];
-    if (index%2==0) {
-        [view setBackgroundColor:[UIColor grayColor]];
-    }else
-    {
-        [view setBackgroundColor:[UIColor lightGrayColor]];
-    }
+    [view setBackgroundColor:[self CellColorWith:index]];
     return view;
 }
+
 
 - (void)nagetiveAction:(UIGestureRecognizer*) gesture
 {
